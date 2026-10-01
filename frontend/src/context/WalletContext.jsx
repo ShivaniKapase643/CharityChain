@@ -28,6 +28,19 @@ const NETWORK_DISPLAY_NAME = import.meta.env.VITE_NETWORK_NAME || (
   REQUIRED_CHAIN_ID === 11155111 ? "Sepolia Testnet" : "Hardhat Local"
 );
 
+const getEthereumProvider = () => {
+  if (typeof window === "undefined") return null;
+
+  const { ethereum } = window;
+  if (!ethereum) return null;
+
+  if (Array.isArray(ethereum.providers) && ethereum.providers.length > 0) {
+    return ethereum.providers.find((provider) => provider?.isMetaMask) || ethereum.providers[0];
+  }
+
+  return ethereum;
+};
+
 export function WalletProvider({ children }) {
   const [account, setAccount] = useState(null);
   const [provider, setProvider] = useState(null);
@@ -40,22 +53,24 @@ export function WalletProvider({ children }) {
 
   // Re-connect if previously connected
   useEffect(() => {
-    if (window.ethereum) {
-      window.ethereum.request({ method: "eth_accounts" }).then((accounts) => {
-        if (accounts.length > 0) {
-          initProvider();
-        }
-      });
+    const ethereum = getEthereumProvider();
+    if (!ethereum) return;
 
-      // Listen for account/chain changes
-      window.ethereum.on("accountsChanged", handleAccountsChanged);
-      window.ethereum.on("chainChanged", handleChainChanged);
-    }
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
-        window.ethereum.removeListener("chainChanged", handleChainChanged);
+    ethereum.request({ method: "eth_accounts" }).then((accounts) => {
+      if (accounts.length > 0) {
+        initProvider();
       }
+    }).catch(() => {
+      // Ignore provider access errors on startup.
+    });
+
+    // Listen for account/chain changes
+    ethereum.on("accountsChanged", handleAccountsChanged);
+    ethereum.on("chainChanged", handleChainChanged);
+
+    return () => {
+      ethereum.removeListener("accountsChanged", handleAccountsChanged);
+      ethereum.removeListener("chainChanged", handleChainChanged);
     };
   }, []);
 
@@ -73,7 +88,13 @@ export function WalletProvider({ children }) {
   };
 
   const initProvider = async () => {
-    const web3Provider = new BrowserProvider(window.ethereum);
+    const ethereum = getEthereumProvider();
+    if (!ethereum) {
+      setError("MetaMask is not installed. Please install MetaMask to use this feature.");
+      return;
+    }
+
+    const web3Provider = new BrowserProvider(ethereum);
     const web3Signer = await web3Provider.getSigner();
     const address = await web3Signer.getAddress();
     const network = await web3Provider.getNetwork();
@@ -85,7 +106,8 @@ export function WalletProvider({ children }) {
   };
 
   const connect = async () => {
-    if (!window.ethereum) {
+    const ethereum = getEthereumProvider();
+    if (!ethereum || !ethereum.request) {
       setError("MetaMask is not installed. Please install MetaMask to use this feature.");
       return false;
     }
@@ -94,14 +116,17 @@ export function WalletProvider({ children }) {
     setError(null);
 
     try {
-      await window.ethereum.request({ method: "eth_requestAccounts" });
+      await ethereum.request({ method: "eth_requestAccounts" });
       await initProvider();
       return true;
     } catch (err) {
-      if (err.code === 4001) {
+      const errorCode = err?.code;
+      const message = err?.message || "Unknown MetaMask error.";
+
+      if (errorCode === 4001) {
         setError("Connection rejected. Please approve MetaMask connection.");
       } else {
-        setError("Failed to connect wallet: " + err.message);
+        setError("Failed to connect wallet: " + message);
       }
       return false;
     } finally {
@@ -122,19 +147,25 @@ export function WalletProvider({ children }) {
    * using the correct RPC and explorer URLs for the configured chain.
    */
   const switchToCorrectNetwork = async () => {
+    const ethereum = getEthereumProvider();
+    if (!ethereum || !ethereum.request) {
+      setError("MetaMask is not installed. Please install MetaMask to use this feature.");
+      return;
+    }
+
     const hexChainId = `0x${REQUIRED_CHAIN_ID.toString(16)}`;
     const netConfig = NETWORK_CONFIG[REQUIRED_CHAIN_ID];
 
     try {
-      await window.ethereum.request({
+      await ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: hexChainId }],
       });
     } catch (err) {
       // Error 4902 = network not added in MetaMask — add it
-      if (err.code === 4902 && netConfig) {
+      if (err?.code === 4902 && netConfig) {
         try {
-          await window.ethereum.request({
+          await ethereum.request({
             method: "wallet_addEthereumChain",
             params: [
               {
@@ -147,10 +178,10 @@ export function WalletProvider({ children }) {
             ],
           });
         } catch (addError) {
-          setError("Failed to add network: " + addError.message);
+          setError("Failed to add network: " + (addError?.message || "Unknown network error."));
         }
       } else {
-        setError("Failed to switch network: " + err.message);
+        setError("Failed to switch network: " + (err?.message || "Unknown network error."));
       }
     }
   };
