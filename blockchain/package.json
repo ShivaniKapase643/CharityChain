@@ -1,0 +1,21 @@
+{
+  "name": "charitychain-blockchain",
+  "version": "1.0.0",
+  "description": "CharityChain Smart Contracts",
+  "scripts": {
+    "compile": "node node_modules/hardhat/internal/cli/cli.js compile",
+    "test": "node node_modules/hardhat/internal/cli/cli.js test",
+    "deploy:local": "node node_modules/hardhat/internal/cli/cli.js run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "node node_modules/hardhat/internal/cli/cli.js run scripts/deploy.js --network sepolia",
+    "node": "node node_modules/hardhat/internal/cli/cli.js node",
+    "clean": "node node_modules/hardhat/internal/cli/cli.js clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "dotenv": "^16.6.1",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+}

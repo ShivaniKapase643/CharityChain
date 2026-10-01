@@ -1,0 +1,58 @@
+# render.yaml — Render deployment configuration for CharityChain
+# https://render.com/docs/yaml-spec
+#
+# This configures two services:
+#   1. charitychain-backend  — Node.js Web Service
+#   2. charitychain-frontend — Static Site (React/Vite)
+#
+# Environment variable values marked "sync: false" must be set
+# manually in the Render dashboard after first deploy.
+
+services:
+  # ────────────────────────────────────────────────────────────
+  # BACKEND — Node.js + Express Web Service
+  # ────────────────────────────────────────────────────────────
+  - type: web
+    name: charitychain-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false          # Set in Render dashboard — MongoDB Atlas URI
+      - key: JWT_SECRET
+        sync: false          # Set in Render dashboard — strong random string
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CONTRACT_ADDRESS
+        sync: false          # Set after Sepolia deployment
+      - key: FRONTEND_URL
+        sync: false          # Set to your Render frontend URL after it deploys
+      - key: ADMIN_EMAIL
+        sync: false          # Set in Render dashboard
+      - key: ADMIN_PASSWORD
+        sync: false          # Set in Render dashboard
+
+  # ────────────────────────────────────────────────────────────
+  # FRONTEND — React/Vite Static Site
+  # ────────────────────────────────────────────────────────────
+  - type: static
+    name: charitychain-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false          # Set to: https://charitychain-backend.onrender.com/api
+      - key: VITE_CONTRACT_ADDRESS
+        sync: false          # Set to Sepolia deployed contract address
+      - key: VITE_NETWORK_CHAIN_ID
+        value: "11155111"    # Sepolia
+      - key: VITE_NETWORK_NAME
+        value: "Sepolia Testnet"

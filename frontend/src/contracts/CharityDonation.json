@@ -1,0 +1,145 @@
+{
+  "address": "0x0000000000000000000000000000000000000000",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {"indexed": true, "name": "charityWallet", "type": "address"},
+        {"indexed": false, "name": "name", "type": "string"},
+        {"indexed": false, "name": "timestamp", "type": "uint256"}
+      ],
+      "name": "CharityRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {"indexed": true, "name": "charityWallet", "type": "address"},
+        {"indexed": false, "name": "timestamp", "type": "uint256"}
+      ],
+      "name": "CharityVerified",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {"indexed": true, "name": "charityWallet", "type": "address"},
+        {"indexed": false, "name": "timestamp", "type": "uint256"}
+      ],
+      "name": "CharityRejected",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {"indexed": true, "name": "donor", "type": "address"},
+        {"indexed": true, "name": "charity", "type": "address"},
+        {"indexed": false, "name": "amount", "type": "uint256"},
+        {"indexed": false, "name": "donationId", "type": "uint256"},
+        {"indexed": false, "name": "timestamp", "type": "uint256"}
+      ],
+      "name": "DonationReceived",
+      "type": "event"
+    },
+    {
+      "inputs": [{"name": "_walletAddress", "type": "address"}, {"name": "_name", "type": "string"}],
+      "name": "registerCharity",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "_charityWallet", "type": "address"}],
+      "name": "verifyCharity",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "_charityWallet", "type": "address"}],
+      "name": "rejectCharity",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "_charityWallet", "type": "address"}],
+      "name": "donate",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "_walletAddress", "type": "address"}],
+      "name": "getCharity",
+      "outputs": [
+        {"name": "walletAddress", "type": "address"},
+        {"name": "name", "type": "string"},
+        {"name": "status", "type": "uint8"},
+        {"name": "totalReceived", "type": "uint256"},
+        {"name": "donorCount", "type": "uint256"}
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "_walletAddress", "type": "address"}],
+      "name": "isCharityVerified",
+      "outputs": [{"name": "", "type": "bool"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "_donor", "type": "address"}],
+      "name": "getDonorDonations",
+      "outputs": [{"name": "", "type": "uint256[]"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "_charity", "type": "address"}],
+      "name": "getCharityDonations",
+      "outputs": [{"name": "", "type": "uint256[]"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{"name": "_donationId", "type": "uint256"}],
+      "name": "getDonation",
+      "outputs": [
+        {"name": "donor", "type": "address"},
+        {"name": "charity", "type": "address"},
+        {"name": "amount", "type": "uint256"},
+        {"name": "timestamp", "type": "uint256"}
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTotalDonations",
+      "outputs": [{"name": "", "type": "uint256"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllCharities",
+      "outputs": [{"name": "", "type": "address[]"}],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTotalCharities",
+      "outputs": [{"name": "", "type": "uint256"}],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+}

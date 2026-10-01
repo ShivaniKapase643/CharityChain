@@ -1,0 +1,41 @@
+# ── Dependencies ────────────────────────────────────────────────
+node_modules/
+
+# ── Environment secrets — NEVER commit these ────────────────────
+.env
+.env.local
+.env.production
+.env.staging
+# Keep .env.example (it has placeholder values only, no secrets)
+!.env.example
+
+# ── Build outputs ────────────────────────────────────────────────
+dist/
+build/
+
+# ── Hardhat / Solidity artifacts ─────────────────────────────────
+cache/
+artifacts/
+coverage/
+.hardhat/
+
+# ── Blockchain deployments ───────────────────────────────────────
+# deployment.json files contain deployed addresses (not secrets,
+# but regenerated per environment — don't commit them)
+blockchain/deployments/
+
+# ── Generated contract files (written by deploy script) ──────────
+# These are auto-generated from the deployment — not committed
+backend/config/contracts/
+
+# ── Logs ─────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── OS files ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editor ───────────────────────────────────────────────────────
+.vscode/settings.json
+*.swp
